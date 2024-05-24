@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import View
 from core.models import Job
 from utilities.rqworker import get_workers_for_queue
-from utilities.utils import normalize_querydict
+from utilities.querydict import normalize_querydict
 from utilities.views import ContentTypePermissionRequiredMixin
 
 from ..constants import JOB_NAME_DEVICE, JOB_NAME_INTERFACE, JOB_NAME_IP, JOB_NAME_SYNC
