@@ -1,4 +1,5 @@
 from netbox.api.viewsets import NetBoxModelViewSet
+
 from .. import filtersets, models
 from .serializers import ApiServerSerializer, ZoneSerializer
 
@@ -17,7 +18,7 @@ class ZoneViewSet(NetBoxModelViewSet):
         "match_device_tags",
         "match_fhrpgroup_tags",
         "match_device_roles",
-        "tags"
+        "tags",
     )
     serializer_class = ZoneSerializer
     filterset_class = filtersets.ZoneFilterSet

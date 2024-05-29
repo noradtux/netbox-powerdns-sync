@@ -1,4 +1,5 @@
 from netbox.plugins import PluginConfig
+
 from .version import __version__
 
 
@@ -15,11 +16,11 @@ class NetBoxPowerdnsSyncConfig(PluginConfig):
         "ttl_custom_field": None,
         "powerdns_managed_record_comment": "netbox-powerdns-sync",
         "post_save_enabled": False,
-        "custom_domain_field": None
+        "custom_domain_field": None,
     }
 
     def ready(self):
         super().ready()
-        import netbox_powerdns_sync.signals
+
 
 config = NetBoxPowerdnsSyncConfig

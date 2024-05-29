@@ -4,10 +4,7 @@ FAMILY_TYPES = {
     6: "AAAA",
 }
 PTR_TYPE = "PTR"
-PTR_ZONE_SUFFIXES = (
-    "in-addr.arpa.",
-    "ip6.arpa."
-)
+PTR_ZONE_SUFFIXES = ("in-addr.arpa.", "ip6.arpa.")
 
 JOB_NAME_IP = "PowerDNS IP Address update"
 JOB_NAME_INTERFACE = "PowerDNS Interface update"

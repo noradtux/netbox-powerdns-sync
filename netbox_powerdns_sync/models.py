@@ -1,23 +1,22 @@
 import powerdns
+from core.models import Job
+from dcim.models import DeviceRole, Interface
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MinLengthValidator
 from django.db import models
 from django.forms import ValidationError
 from django.urls import reverse
-from taggit.managers import TaggableManager
-from core.models import Job
-from dcim.models import DeviceRole, Interface
-from ipam.models import IPAddress, FHRPGroup
-from netbox.models import NetBoxModel
 from extras.models import Tag
+from ipam.models import FHRPGroup, IPAddress
+from netbox.models import NetBoxModel
+from taggit.managers import TaggableManager
 from virtualization.models import VMInterface
 
-from .choices import NamingFgrpGroupChoices, NamingDeviceChoices, NamingIpChoices
+from .choices import NamingDeviceChoices, NamingFgrpGroupChoices, NamingIpChoices
 from .constants import JOB_NAME_SYNC
 from .querysets import EnabledQuerySet, ZoneQuerySet
-from .utils import get_ip_host, make_canonical, is_reverse
+from .utils import get_ip_host, is_reverse, make_canonical
 from .validators import hostname_validator, zone_validator
-
 
 __all__ = (
     "ApiServer",
@@ -32,10 +31,7 @@ class ApiServer(NetBoxModel):
         null=False,
         unique=True,
     )
-    description = models.CharField(
-        max_length=200,
-        blank=True
-    )
+    description = models.CharField(max_length=200, blank=True)
     enabled = models.BooleanField(
         null=False,
         default=True,
@@ -54,7 +50,12 @@ class ApiServer(NetBoxModel):
     objects = EnabledQuerySet.as_manager()
 
     clone_fields = (
-        "name", "api_url", "api_token", "description", "enabled", "tags",
+        "name",
+        "api_url",
+        "api_token",
+        "description",
+        "enabled",
+        "tags",
     )
 
     class Meta:
@@ -68,7 +69,7 @@ class ApiServer(NetBoxModel):
         return self.name
 
     @property
-    def api(self) -> powerdns.PDNSEndpoint|None:
+    def api(self) -> powerdns.PDNSEndpoint | None:
         if not self.api_url or not self.api_url:
             return None
         api_client = powerdns.PDNSApiClient(
@@ -87,10 +88,7 @@ class Zone(NetBoxModel):
         unique=True,
         validators=[MinLengthValidator(3), hostname_validator, zone_validator],
     )
-    description = models.CharField(
-        max_length=200,
-        blank=True
-    )
+    description = models.CharField(max_length=200, blank=True)
     enabled = models.BooleanField(
         null=False,
         default=True,
@@ -148,7 +146,7 @@ class Zone(NetBoxModel):
     match_interface_mgmt_only = models.BooleanField(
         default=False,
         verbose_name="Match management interfaces only",
-        help_text="Use this zone only for addresses assigned to management interfaces (other criteria must match first)"
+        help_text="Use this zone only for addresses assigned to management interfaces (other criteria must match first)",
     )
     naming_ip_method = models.CharField(
         max_length=200,
@@ -180,10 +178,7 @@ class Zone(NetBoxModel):
     #   for 'netbox_dns.Zone.tags' clashes with reverse accessor for
     #   'netbox_powerdns_sync.Zone.tags'
     # So let's disable generating reverse relation here.
-    tags = TaggableManager(
-        through="extras.TaggedItem",
-        related_name="+"
-    )
+    tags = TaggableManager(through="extras.TaggedItem", related_name="+")
 
     @property
     def is_reverse(self) -> bool:
@@ -200,10 +195,14 @@ class Zone(NetBoxModel):
                 raise ValidationError(msg)
             else:
                 raise ValidationError({"is_default": msg})
-        
-        if not self.is_reverse and not any((
-            self.naming_ip_method, self.naming_fgrpgroup_method, self.naming_device_method
-        )):
+
+        if not self.is_reverse and not any(
+            (
+                self.naming_ip_method,
+                self.naming_fgrpgroup_method,
+                self.naming_device_method,
+            )
+        ):
             raise ValidationError("At least one of naming methods must be set")
 
     def delete(self, *args, **kwargs):
@@ -213,32 +212,32 @@ class Zone(NetBoxModel):
                 object_type_id=ContentType.objects.get_for_model(self).pk,
                 object_id=self.pk,
                 status="scheduled",
-                name=JOB_NAME_SYNC
+                name=JOB_NAME_SYNC,
             )
             jobs.delete()
         return super().delete(*args, **kwargs)
 
     @classmethod
     def get_best_zone(cls, name: str) -> "Zone|None":
-        """ Get the longest matching zone for a given name """
+        """Get the longest matching zone for a given name"""
         name = make_canonical(name)
         best_match = None
         for zone in cls.objects.all():
             if name.endswith(zone.name):
                 if not best_match or len(best_match.name) < len(zone.name):
                     best_match = zone
-        
-        
+
         return best_match
 
     @classmethod
-    def match_ip(cls, ip:IPAddress) -> "[Zone]":
+    def match_ip(cls, ip: IPAddress) -> "[Zone]":
         """
         For a given IPAddress figure out the correct zones based on
         IPAddress, Interface, Device ir FHRPGroup tags or Device role.
         """
+
         def filter_mgmt_only(zones, ip):
-            """ Checks if IP is assigned to interface.mgmt_only=True and finds matching zones """
+            """Checks if IP is assigned to interface.mgmt_only=True and finds matching zones"""
             if not zones:
                 # no results, just return
                 return zones
@@ -257,10 +256,13 @@ class Zone(NetBoxModel):
         zones = filter_mgmt_only(zones, ip)
         if zones:
             return zones
-        if isinstance(ip.assigned_object, Interface) or \
-            isinstance(ip.assigned_object, VMInterface):
+        if isinstance(ip.assigned_object, Interface) or isinstance(
+            ip.assigned_object, VMInterface
+        ):
             # tag on Interface or VMInterface
-            zones = cls.objects.filter(match_interface_tags__in=ip.assigned_object.tags.all())
+            zones = cls.objects.filter(
+                match_interface_tags__in=ip.assigned_object.tags.all()
+            )
             zones = filter_mgmt_only(zones, ip)
             if zones:
                 return zones
@@ -271,7 +273,9 @@ class Zone(NetBoxModel):
             if zones:
                 return zones
         if isinstance(ip.assigned_object, FHRPGroup):
-            zones = cls.objects.filter(match_fhrpgroup_tags__in=ip.assigned_object.tags.all())
+            zones = cls.objects.filter(
+                match_fhrpgroup_tags__in=ip.assigned_object.tags.all()
+            )
             zones = filter_mgmt_only(zones, ip)
             if zones:
                 return zones
@@ -292,10 +296,19 @@ class Zone(NetBoxModel):
         return cls.objects.none()
 
     clone_fields = (
-        "name", "description", "api_servers", "default_ttl",
-        "match_ipaddress_tags", "match_interface_tags", "match_device_tags",
-        "match_fhrpgroup_tags", "match_device_roles", "match_interface_mgmt_only",
-        "naming_ip_method", "naming_device_method", "naming_fgrpgroup_method",
+        "name",
+        "description",
+        "api_servers",
+        "default_ttl",
+        "match_ipaddress_tags",
+        "match_interface_tags",
+        "match_device_tags",
+        "match_fhrpgroup_tags",
+        "match_device_roles",
+        "match_interface_mgmt_only",
+        "naming_ip_method",
+        "naming_device_method",
+        "naming_fgrpgroup_method",
         "tags",
     )
 

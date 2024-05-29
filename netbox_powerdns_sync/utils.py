@@ -4,9 +4,9 @@ import unicodedata
 from dcim.models import Device, Interface
 from django.contrib.contenttypes.models import ContentType
 from extras.choices import ObjectChangeActionChoices
-from netbox.plugins.utils import get_plugin_config
 from extras.models import ObjectChange
 from ipam.models import IPAddress
+from netbox.plugins.utils import get_plugin_config
 from powerdns import Comment, RRSet
 from virtualization.models import VirtualMachine, VMInterface
 
@@ -117,18 +117,19 @@ def find_objectchange_ip(ip, request_id):
         changed_object_id=ip.pk,
     )
 
+
 def set_dns_name(ip_address_str: str, dns_name_str: str) -> bool:
     """
     Set the DNS name for a given IPAddress in NetBox.
-    
+
     Parameters:
     - ip_address_str (str): The IP address for which the DNS name needs to be set.
     - dns_name_str (str): The DNS name to set for the given IP address.
-    
+
     Returns:
     - bool: True if the operation succeeded, False otherwise.
     """
-    
+
     try:
         print(f"Setting DNS name {dns_name_str} for IP address {ip_address_str}")
         ip_address = IPAddress.objects.get(address=str(ip_address_str))

@@ -1,11 +1,11 @@
 import importlib
 
-from dcim.models import Interface, Device
+from dcim.models import Interface
 from ipam.models import FHRPGroup, IPAddress
 from virtualization.models import VMInterface
 
 from .models import Zone
-from .utils import make_canonical, make_dns_label, get_custom_domain
+from .utils import make_canonical, make_dns_label
 
 
 def _load_class(path: str) -> object:
@@ -35,7 +35,11 @@ def generate_fqdn(ip: IPAddress, zone: Zone) -> str | None:
     """
 
     fqdn = None
-    for method_attr in ['naming_ip_method', 'naming_device_method', 'naming_fgrpgroup_method']:
+    for method_attr in [
+        "naming_ip_method",
+        "naming_device_method",
+        "naming_fgrpgroup_method",
+    ]:
         method = getattr(zone, method_attr, None)
         if method:
             klass = _load_class(method)
@@ -44,7 +48,6 @@ def generate_fqdn(ip: IPAddress, zone: Zone) -> str | None:
             if fqdn:
                 return fqdn
     return None
-
 
 
 class NamingBase:
@@ -97,7 +100,7 @@ class NamingBase:
         if isinstance(self.ip.assigned_object, Interface):
             self.interface = self.ip.assigned_object
             self.host = self.ip.assigned_object.device
-            
+
         elif isinstance(self.ip.assigned_object, VMInterface):
             self.interface = self.ip.assigned_object
             self.host = self.ip.assigned_object.virtual_machine
@@ -142,12 +145,7 @@ class NamingDeviceByInterfacePrimary(NamingBase):
             # this doesnt make much sense
             # if self.ip != self.host.primary_ip4 and self.ip != self.host.primary_ip6:
             if self.interface and self.interface.name:
-                name = (
-                    make_dns_label(self.interface.name)
-                    + "-"
-                    + name
-                    
-                )
+                name = make_dns_label(self.interface.name) + "-" + name
             return name
 
 

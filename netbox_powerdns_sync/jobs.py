@@ -215,7 +215,6 @@ class PowerdnsTaskIP(PowerdnsTask):
 
         if not self.forward_zone:
             self.log_info(f"No matching forward zone found for IP:{self.ip}. Skipping")
-            pass
         else:
             self.log_info(f"Found matching forward zone to be {self.forward_zone}")
 
@@ -228,8 +227,9 @@ class PowerdnsTaskIP(PowerdnsTask):
         self.log_debug(f"Reverse FQDN: {reverse_fqdn}")
         self.reverse_zone = Zone.get_best_zone(str(reverse_fqdn))
         if not self.reverse_zone:
-            self.log_info(f"No matching reverse zone for {self.ip} ({self.fqdn}). Skipping")
-            pass
+            self.log_info(
+                f"No matching reverse zone for {self.ip} ({self.fqdn}). Skipping"
+            )
 
         self.log_debug(
             f"Reverse zone found for IP:{self.ip} (zone:{self.reverse_zone})"
@@ -373,7 +373,13 @@ class PowerdnsTaskFullSync(PowerdnsTask):
         parts = zone_domain.split(".")
 
         network_cidr = None
-        if len(parts) >= 3 and parts[-2] == "in-addr" and parts[-1] == "arpa" or len(parts) > 3 and parts[-1] == "ip6":
+        if (
+            len(parts) >= 3
+            and parts[-2] == "in-addr"
+            and parts[-1] == "arpa"
+            or len(parts) > 3
+            and parts[-1] == "ip6"
+        ):
             self.log_debug(f"Zone is reverse zone, looking for prefixes")
 
             if len(parts) >= 3 and parts[-2] == "in-addr" and parts[-1] == "arpa":
@@ -386,7 +392,7 @@ class PowerdnsTaskFullSync(PowerdnsTask):
                 elif len(parts) == 3:  # e.g., 10.in-addr.arpa -> 10.0.0.0/8
                     base_ip = f"{parts[0]}.0.0.0"
                     network_cidr = IPNetwork(f"{base_ip}/8")
-                
+
                 else:
                     network_cidr = None
         elif len(parts) > 3 and parts[-2] == "ip6" and parts[-1] == "arpa":
@@ -394,10 +400,12 @@ class PowerdnsTaskFullSync(PowerdnsTask):
             # IPv6 reverse DNS is in nibbles, e.g., 1.0.0.0.2.ip6.arpa -> 2000::/32
             reversed_nibbles = parts[:-2]
             reversed_nibbles.reverse()
-            
+
             # Join nibbles and separate into groups of 4 hex digits
-            ipv6_nibbles = ''.join(reversed_nibbles)
-            ipv6_address_parts = [ipv6_nibbles[i:i+4] for i in range(0, len(ipv6_nibbles), 4)]
+            ipv6_nibbles = "".join(reversed_nibbles)
+            ipv6_address_parts = [
+                ipv6_nibbles[i : i + 4] for i in range(0, len(ipv6_nibbles), 4)
+            ]
 
             # Calculate the network prefix length
             network_length = len(reversed_nibbles) * 4
@@ -405,15 +413,13 @@ class PowerdnsTaskFullSync(PowerdnsTask):
             # Ensure the address has a valid IPv6 format
             try:
                 # Join parts with ':' to form valid IPv6 address notation
-                ipv6_address = ':'.join(ipv6_address_parts)
+                ipv6_address = ":".join(ipv6_address_parts)
                 ipv6_network = IPNetwork(f"{ipv6_address}::/{network_length}")
                 network_cidr = ipv6_network
             except Exception as e:
                 self.log_debug(f"Invalid IPv6 address constructed: {ipv6_address}")
                 self.log_debug(f"AddrFormatError: {e}")
                 network_cidr = None
-
-
 
         if network_cidr:
             self.log_debug(

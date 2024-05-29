@@ -1,10 +1,10 @@
 import django_filters
-from django.db.models import Q
 from dcim.models import DeviceRole
+from django.db.models import Q
 from netbox.filtersets import NetBoxModelFilterSet
 from utilities import filters
 
-from .choices import NamingDeviceChoices, NamingIpChoices, NamingFgrpGroupChoices
+from .choices import NamingDeviceChoices, NamingFgrpGroupChoices, NamingIpChoices
 from .models import *
 
 __all__ = (
@@ -23,10 +23,7 @@ class ApiServerFilterSet(NetBoxModelFilterSet):
     def search(self, queryset, name, value):
         if not value.strip():
             return queryset
-        return queryset.filter(
-            Q(name__icontains=value) |
-            Q(api_url__icontains=value)
-        )
+        return queryset.filter(Q(name__icontains=value) | Q(api_url__icontains=value))
 
     class Meta:
         model = ApiServer
@@ -40,8 +37,7 @@ class ZoneFilterSet(NetBoxModelFilterSet):
         label="API Server (ID)",
     )
     reverse = django_filters.BooleanFilter(
-        method="filter_reverse",
-        label="Reverse zones"
+        method="filter_reverse", label="Reverse zones"
     )
     match_tags = filters.MultiValueCharFilter(
         method="filter_match_tags",
@@ -65,15 +61,16 @@ class ZoneFilterSet(NetBoxModelFilterSet):
         if not value.strip():
             return queryset
         return queryset.filter(
-            Q(name__icontains=value)|
-            Q(description__icontains=value)
+            Q(name__icontains=value) | Q(description__icontains=value)
         )
 
-    def filter_match_tags(self, queryset, name, value):        
-        query = Q(match_ipaddress_tags__slug__in=value)|\
-            Q(match_interface_tags__slug__in=value)|\
-            Q(match_device_tags__slug__in=value)|\
-            Q(match_fhrpgroup_tags__slug__in=value)
+    def filter_match_tags(self, queryset, name, value):
+        query = (
+            Q(match_ipaddress_tags__slug__in=value)
+            | Q(match_interface_tags__slug__in=value)
+            | Q(match_device_tags__slug__in=value)
+            | Q(match_fhrpgroup_tags__slug__in=value)
+        )
         return queryset.filter(query).distinct()
 
     def filter_reverse(self, queryset, name, value):

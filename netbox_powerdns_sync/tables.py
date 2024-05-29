@@ -4,7 +4,6 @@ from netbox.tables import NetBoxTable, columns
 
 from . import models
 
-
 __all__ = (
     "ApiServerTable",
     "SyncJobTable",
@@ -34,24 +33,29 @@ ZONE_EXTRA_BUTTONS = """
 
 
 class ApiServerTable(NetBoxTable):
-    name = tables.Column(
-        linkify=True
-    )
+    name = tables.Column(linkify=True)
     zone_count = columns.LinkedCountColumn(
         viewname="plugins:netbox_powerdns_sync:zone_list",
         url_params={"api_server_id": "pk"},
-        verbose_name="Zones"
+        verbose_name="Zones",
     )
     enabled = columns.BooleanColumn()
-    tags = columns.TagColumn(
-        url_name="plugins:netbox_powerdns_sync:apiserver_list"
-    )
+    tags = columns.TagColumn(url_name="plugins:netbox_powerdns_sync:apiserver_list")
 
     class Meta(NetBoxTable.Meta):
         model = models.ApiServer
         fields = (
-            "pk", "id", "name", "zone_count", "description", "enabled", "api_url",
-            "tags", "actions", "created", "last_updated",
+            "pk",
+            "id",
+            "name",
+            "zone_count",
+            "description",
+            "enabled",
+            "api_url",
+            "tags",
+            "actions",
+            "created",
+            "last_updated",
         )
         default_columns = ("pk", "name", "zone_count", "description", "enabled")
 
@@ -69,13 +73,11 @@ class SyncJobTable(JobTable):
 
 
 class ZoneTable(NetBoxTable):
-    name = tables.Column(
-        linkify=True
-    )
+    name = tables.Column(linkify=True)
     api_server_count = columns.LinkedCountColumn(
         viewname="plugins:netbox_powerdns_sync:apiserver_list",
         url_params={"zone_id": "pk"},
-        verbose_name="API Servers"
+        verbose_name="API Servers",
     )
     enabled = columns.BooleanColumn()
     is_default = columns.BooleanColumn()
@@ -83,21 +85,11 @@ class ZoneTable(NetBoxTable):
         verbose_name="Reverse zone",
         orderable=False,
     )
-    match_ipaddress_tags = columns.TagColumn(
-        url_name="ipam:ipaddress_list"
-    )
-    match_interface_tags = columns.TagColumn(
-        url_name="dcim:interface_list"
-    )
-    match_device_tags = columns.TagColumn(
-        url_name="dcim:device_list"
-    )
-    match_fhrpgroup_tags = columns.TagColumn(
-        url_name="ipam:fhrpgroup_list"
-    )
-    match_device_roles = columns.TemplateColumn(
-        template_code=DEVICE_ROLE_COLUMN
-    )
+    match_ipaddress_tags = columns.TagColumn(url_name="ipam:ipaddress_list")
+    match_interface_tags = columns.TagColumn(url_name="dcim:interface_list")
+    match_device_tags = columns.TagColumn(url_name="dcim:device_list")
+    match_fhrpgroup_tags = columns.TagColumn(url_name="ipam:fhrpgroup_list")
+    match_device_roles = columns.TemplateColumn(template_code=DEVICE_ROLE_COLUMN)
     match_interface_mgmt_only = columns.BooleanColumn()
     tags = columns.TagColumn(
         url_name="plugins:netbox_powerdns_sync:zone_list",
@@ -109,11 +101,27 @@ class ZoneTable(NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = models.Zone
         fields = (
-            "pk", "id", "name", "api_server_count", "description",  "enabled",
-            "is_default", "is_reverse", "default_ttl", "match_ipaddress_tags",
-            "match_interface_tags", "match_device_tags", "match_fhrpgroup_tags",
-            "match_device_roles", "match_interface_mgmt_only", "naming_ip_method",
-            "naming_device_method", "naming_fgrpgroup_method", "tags", "actions",
-            "created", "last_updated",
+            "pk",
+            "id",
+            "name",
+            "api_server_count",
+            "description",
+            "enabled",
+            "is_default",
+            "is_reverse",
+            "default_ttl",
+            "match_ipaddress_tags",
+            "match_interface_tags",
+            "match_device_tags",
+            "match_fhrpgroup_tags",
+            "match_device_roles",
+            "match_interface_mgmt_only",
+            "naming_ip_method",
+            "naming_device_method",
+            "naming_fgrpgroup_method",
+            "tags",
+            "actions",
+            "created",
+            "last_updated",
         )
         default_columns = ("pk", "name", "enabled", "is_default", "default_ttl")

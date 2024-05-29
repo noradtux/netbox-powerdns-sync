@@ -1,5 +1,5 @@
-from django import forms
 from dcim.models import DeviceRole
+from django import forms
 from netbox.forms import NetBoxModelFilterSetForm
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.fields import DynamicModelMultipleChoiceField, TagFilterField
@@ -7,7 +7,6 @@ from utilities.forms.fields import DynamicModelMultipleChoiceField, TagFilterFie
 from ..choices import NamingDeviceChoices, NamingFgrpGroupChoices, NamingIpChoices
 from ..fields import MatchTagFilterField
 from ..models import ApiServer, Zone
-
 
 __all__ = (
     "ApiServerFilterForm",
@@ -27,9 +26,7 @@ class ApiServerFilterForm(NetBoxModelFilterSetForm):
     enabled = forms.NullBooleanField(
         required=False,
         label="Is Enabled",
-        widget=forms.Select(
-            choices=BOOLEAN_WITH_BLANK_CHOICES
-        )
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
     )
     tag = TagFilterField(model)
 
@@ -46,16 +43,12 @@ class ZoneFilterForm(NetBoxModelFilterSetForm):
     enabled = forms.NullBooleanField(
         required=False,
         label="Is Enabled",
-        widget=forms.Select(
-            choices=BOOLEAN_WITH_BLANK_CHOICES
-        )
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
     )
     reverse = forms.NullBooleanField(
         required=False,
         label="Reverse zones",
-        widget=forms.Select(
-            choices=BOOLEAN_WITH_BLANK_CHOICES
-        )
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
     )
     match_tags = MatchTagFilterField()
     match_device_roles = DynamicModelMultipleChoiceField(

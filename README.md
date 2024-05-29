@@ -80,9 +80,7 @@ After installation, enable the plugin in `/opt/netbox/netbox/netbox/configuratio
  or if you use netbox-docker, your `/configuration/plugins.py` file :
 
 ```python
-PLUGINS = [
-    'netbox_powerdns_sync'
-]
+PLUGINS = ["netbox_powerdns_sync"]
 
 PLUGINS_CONFIG = {
     "netbox_powerdns_sync": {},

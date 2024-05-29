@@ -1,9 +1,9 @@
-from rest_framework import serializers
-from netbox.api.serializers import NetBoxModelSerializer, NestedTagSerializer
 from dcim.api.serializers import NestedDeviceRoleSerializer
+from netbox.api.serializers import NestedTagSerializer, NetBoxModelSerializer
+from rest_framework import serializers
 
-from .nested_serializers import *
 from ..models import ApiServer, Zone
+from .nested_serializers import NestedApiServerSerializer, NestedZoneSerializer
 
 
 class ApiServerSerializer(NetBoxModelSerializer):
@@ -15,8 +15,19 @@ class ApiServerSerializer(NetBoxModelSerializer):
     class Meta:
         model = ApiServer
         fields = (
-            "id", "url", "display", "name", "api_url", "api_token", "enabled",
-            "description", "zones", "tags", "custom_fields", "created", "last_updated"
+            "id",
+            "url",
+            "display",
+            "name",
+            "api_url",
+            "api_token",
+            "enabled",
+            "description",
+            "zones",
+            "tags",
+            "custom_fields",
+            "created",
+            "last_updated",
         )
 
 
@@ -35,10 +46,27 @@ class ZoneSerializer(NetBoxModelSerializer):
     class Meta:
         model = Zone
         fields = (
-            "id", "url", "display", "name", "description", "api_servers", "enabled",
-            "is_reverse", "is_default", "default_ttl", "match_ipaddress_tags",
-            "match_interface_tags", "match_device_tags", "match_fhrpgroup_tags",
-            "match_device_roles", "match_interface_mgmt_only", "naming_ip_method",
-            "naming_device_method", "naming_fgrpgroup_method", "tags",
-            "custom_fields", "created", "last_updated"
+            "id",
+            "url",
+            "display",
+            "name",
+            "description",
+            "api_servers",
+            "enabled",
+            "is_reverse",
+            "is_default",
+            "default_ttl",
+            "match_ipaddress_tags",
+            "match_interface_tags",
+            "match_device_tags",
+            "match_fhrpgroup_tags",
+            "match_device_roles",
+            "match_interface_mgmt_only",
+            "naming_ip_method",
+            "naming_device_method",
+            "naming_fgrpgroup_method",
+            "tags",
+            "custom_fields",
+            "created",
+            "last_updated",
         )

@@ -4,7 +4,7 @@ from .utils import can_manage_record, get_managed_comment
 
 
 class DnsRecord:
-    def __init__(self, name:str, data:str, dns_type:str, zone_name:str, ttl:int):
+    def __init__(self, name: str, data: str, dns_type: str, zone_name: str, ttl: int):
         self.name = name.replace(zone_name, "")
         self.name = self.name.rstrip(".")
         self.data = data
@@ -13,7 +13,9 @@ class DnsRecord:
         self.zone_name = zone_name
 
     @classmethod
-    def from_pdns_record(cls, record:dict, zone:powerdns.interface.PDNSZone) -> tuple['DnsRecord']:
+    def from_pdns_record(
+        cls, record: dict, zone: powerdns.interface.PDNSZone
+    ) -> tuple["DnsRecord"]:
         dns_records = set()
         if not can_manage_record(record):
             return set()
@@ -29,15 +31,27 @@ class DnsRecord:
         return dns_records
 
     def as_rrset(self) -> powerdns.RRSet:
-        return powerdns.RRSet(self.name, self.dns_type, [self.data], ttl=self.ttl, comments=get_managed_comment())
+        return powerdns.RRSet(
+            self.name,
+            self.dns_type,
+            [self.data],
+            ttl=self.ttl,
+            comments=get_managed_comment(),
+        )
 
     def __hash__(self) -> int:
-        return hash(tuple([self.name, self.dns_type, self.ttl, self.data, self.zone_name]))
+        return hash(
+            tuple([self.name, self.dns_type, self.ttl, self.data, self.zone_name])
+        )
 
     def __eq__(self, other: "DnsRecord") -> bool:
-        return self.name == other.name and self.data == other.data and \
-            self.dns_type == other.dns_type and self.ttl == other.ttl and \
-            self.zone_name == other.zone_name
+        return (
+            self.name == other.name
+            and self.data == other.data
+            and self.dns_type == other.dns_type
+            and self.ttl == other.ttl
+            and self.zone_name == other.zone_name
+        )
 
     def __repr__(self) -> str:
         return f"<DNSRecord: {self}>"

@@ -1,20 +1,18 @@
 import logging
 
-from django.dispatch import receiver
-from django.db import transaction
-from django.db.models.signals import post_save
-
 from core.models import Job
 from dcim.models import Device, Interface
-from netbox.plugins.utils import get_plugin_config
-from ipam.models import IPAddress, FHRPGroup
+from django.db import transaction
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from ipam.models import FHRPGroup
 from netbox.context import current_request
+from netbox.plugins.utils import get_plugin_config
 from virtualization.models import VirtualMachine, VMInterface
 
-from .constants import JOB_NAME_DEVICE, JOB_NAME_INTERFACE, JOB_NAME_IP, PLUGIN_NAME
+from .constants import JOB_NAME_DEVICE, JOB_NAME_INTERFACE, PLUGIN_NAME
 from .jobs import PowerdnsTaskIP
 from .utils import find_objectchange_ip
-
 
 logger = logging.getLogger("netbox.netbox_powerdns_sync.signals")
 
@@ -25,9 +23,7 @@ IPADDRESS_DNS_FIELDS = (
     "assigned_object_type",
 )
 
-INTERFACE_DNS_FIELDS = (
-    "name",
-)
+INTERFACE_DNS_FIELDS = ("name",)
 
 DEVICE_DNS_FIELDS = (
     "name",
@@ -36,8 +32,8 @@ DEVICE_DNS_FIELDS = (
 )
 
 
-#@receiver(post_save, sender=IPAddress)
-#def update_ipaddress_dns(instance, **kwargs):
+# @receiver(post_save, sender=IPAddress)
+# def update_ipaddress_dns(instance, **kwargs):
 #    if not get_plugin_config(PLUGIN_NAME, "post_save_enabled"):
 #        return
 #    changed = True
