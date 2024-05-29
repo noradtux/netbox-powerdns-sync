@@ -42,6 +42,13 @@ def get_custom_domain(ip: IPAddress) -> str | None:
     return ""
 
 
+def get_default_rdns() -> str | None:
+    """
+    Get custom domain from plugin configuration
+    """
+    return get_plugin_config(PLUGIN_NAME, "default_rnds_value")
+
+
 def get_ip_ttl(ip: IPAddress) -> int | None:
     """
     Get TTL from IPAddress custom field if set. Else None.

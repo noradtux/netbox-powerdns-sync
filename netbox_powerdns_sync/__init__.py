@@ -17,6 +17,7 @@ class NetBoxPowerdnsSyncConfig(PluginConfig):
         "powerdns_managed_record_comment": "netbox-powerdns-sync",
         "post_save_enabled": False,
         "custom_domain_field": None,
+        "default_rnds_value": 'not.configured.dns.server'
     }
 
     def ready(self):

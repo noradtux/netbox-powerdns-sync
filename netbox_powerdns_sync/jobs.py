@@ -23,6 +23,7 @@ from .utils import (
     make_canonical,
     make_dns_label,
     set_dns_name,
+    get_default_rdns
 )
 
 logger = logging.getLogger("netbox.netbox_powerdns_sync.jobs")
@@ -508,6 +509,10 @@ class PowerdnsTaskFullSync(PowerdnsTask):
                     )
                     fqdn = generate_fqdn(self.ip, self.reverse_zone)
                     custom_domain = get_custom_domain(self.ip)
+                    
+                    if fqdn == "":
+                        fqdn = get_default_rdns()
+                        
                     records.add(
                         DnsRecord(
                             name=name,
