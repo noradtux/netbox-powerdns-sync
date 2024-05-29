@@ -4,8 +4,8 @@ import unicodedata
 from dcim.models import Device, Interface
 from django.contrib.contenttypes.models import ContentType
 from extras.choices import ObjectChangeActionChoices
+from netbox.plugins.utils import get_plugin_config
 from extras.models import ObjectChange
-from extras.plugins.utils import get_plugin_config
 from ipam.models import IPAddress
 from powerdns import Comment, RRSet
 from virtualization.models import VirtualMachine, VMInterface
