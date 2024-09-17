@@ -1,4 +1,4 @@
-from dcim.api.serializers import NestedDeviceRoleSerializer
+from dcim.api.serializers import DeviceRoleSerializer
 from netbox.api.serializers import NestedTagSerializer, NetBoxModelSerializer
 from rest_framework import serializers
 
@@ -41,7 +41,7 @@ class ZoneSerializer(NetBoxModelSerializer):
     match_interface_tags = NestedTagSerializer(many=True, required=False)
     match_device_tags = NestedTagSerializer(many=True, required=False)
     match_fhrpgroup_tags = NestedTagSerializer(many=True, required=False)
-    match_device_roles = NestedDeviceRoleSerializer(many=True, required=False)
+    match_device_roles = DeviceRoleSerializer(many=True, required=False)
 
     class Meta:
         model = Zone
