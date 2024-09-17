@@ -3,8 +3,9 @@ import unicodedata
 
 from dcim.models import Device, Interface
 from django.contrib.contenttypes.models import ContentType
-from extras.choices import ObjectChangeActionChoices
-from extras.models import ObjectChange
+from extras.choices import ChangeActionChoices
+from netbox.plugins.utils import get_plugin_config
+from core.models import ObjectChange
 from ipam.models import IPAddress
 from netbox.plugins.utils import get_plugin_config
 from powerdns import Comment, RRSet
@@ -118,7 +119,7 @@ def is_reverse(name: str) -> bool:
 
 def find_objectchange_ip(ip, request_id):
     return ObjectChange.objects.filter(
-        action=ObjectChangeActionChoices.ACTION_CREATE,
+        action=ChangeActionChoices.ACTION_CREATE,
         request_id=request_id,
         changed_object_type=ContentType.objects.get_for_model(ip),
         changed_object_id=ip.pk,
